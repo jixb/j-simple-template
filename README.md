@@ -1,1 +1,0 @@
-# vuej-simple-template

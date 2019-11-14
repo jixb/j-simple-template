@@ -1,48 +1,59 @@
 import iaxios from './iaxios'
 
-const handleError = function (code, msg) {
-  console.log(code + '' + msg)
-  // switch (code) {
-  //   case 200:
-  //     message.success(msg)
-  //     break;
-  //   case 400:
-  //     message.warning(msg)
-  //     break
-  //   case 401:
-  //     message.warning(msg)
-  //     break;
-  //   case 404:
-  //     message.error(msg)
-  //     break;
-  //   case 500:
-  //     message.error(msg)
-  //     break;
-  //   default:
-  //     message.error('请求出错了')
-  // }
+const showMessage = {
+  success (msg) {
+    console.log( msg)
+  },
+  warning (msg) {
+    console.warn(msg)
+  },
+  error (msg) {
+    console.error(msg)
+  }
 }
 
-const http = function (url, method, param, config, showMessage) {
-  method = method ? method.toLowerCase() : 'get'
+const handleError = function (code, msg) {
+  switch (code) {
+    case 200:
+      showMessage.success(msg)
+      break;
+    case 400:
+      showMessage.warning(msg)
+      break
+    case 401:
+      showMessage.warning(msg)
+      break;
+    case 404:
+      showMessage.error(msg)
+      break;
+    case 500:
+      showMessage.error(msg)
+      break;
+    default:
+      showMessage.error('请求出错了')
+  }
+}
+
+const http = function (url, method = 'get', param, config, showMessage) {
+  method = method.toLocaleLowerCase()
+
   return new Promise((resolve, reject) => {
     iaxios[method](url, param, config).then(res => {
       const data = res.data
-      const code = res.data.code
+
       showMessage && handleError(data.code, data.message)
-      if (code) {
-        if (code === 200) {
-          resolve(res.data)
-        } else {
-          reject()
-        }
+
+      if (data.code === 200) {
+        resolve(data)
       } else {
-        resolve(res.data)
+        reject({code: -2, message: data.message})
       }
     }).catch(err => {
       const res = err.response
+
       handleError(res.status, res.statusText)
-      reject(err)
+
+      reject({code: -1, message: res.statusText})
     })
   })
 }

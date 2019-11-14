@@ -4,7 +4,7 @@ axios.defaults.headers = {
   'api-version': 'V1',
 }
 
-axios.defaults.baseURL = '/api/f'
+axios.defaults.baseURL = '/'
 
 axios.interceptors.request.use(function (config) {
   return config;
